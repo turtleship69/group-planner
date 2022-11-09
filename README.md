@@ -4,8 +4,7 @@ Select dates when you're free, or when you're busy, and see what dates work for 
 
 ## Usage
 
-Go to /new to create a new event.
-Copy the link and send it to your friends.
+Go to /new to create a new event.  You'll be given a link to share with your friends.  They can then go to that link to add their availability.  You can then see what dates work for everyone.
 ✨magic✨
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
