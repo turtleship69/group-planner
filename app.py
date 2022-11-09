@@ -23,6 +23,12 @@ Session(app)
 #create a 2d array of all the timeslots
 #first list is the days of the week, second list is every hour of the day
 TIMESLOTS = [[0 for i in range(24)] for j in range(7)] # [[12am-11pm]mon-sun]
+DEVELOPER = False
+
+def debugOut(msg):
+    global DEVELOPER
+    if DEVELOPER:
+        print(msg)
 
 database = {}
 
@@ -30,11 +36,13 @@ count = 0
 
 @app.route("/")
 def index():
-    resp = make_response(dumps(database))
-    #add json header
-    resp.headers['Content-Type'] = 'application/json'
-    pprint(TIMESLOTS)
-    return resp
+    if DEVELOPER:
+        resp = make_response(dumps(database))
+        #add json header
+        resp.headers['Content-Type'] = 'application/json'
+        pprint(TIMESLOTS)
+        return resp
+    return render_template("index.html")
 
 """create a new event
 ask user for name, and brief description
@@ -64,13 +72,13 @@ def new():
         #create a copy of the timeslots array, and for every time the user is unavailable, set the value to 1
         event_timeslots = [[0 for i in range(24)] for j in range(7)]#TIMESLOTS[:]
         if not data["blacklist"]:
-            print("whitelist")
-            pprint(data["availability"])
+            debugOut("whitelist")
+            #pprint(data["availability"])
             for time in data["availability"]:
                 timeList = time.split(",")
                 event_timeslots[int(timeList[0])][int(timeList[1])] = 1
         else:
-            print("blacklist")
+            debugOut("blacklist")
             for i in range(7):
                 for j in range(24):
                     if f"{i},{j}" in data["availability"]:
@@ -88,7 +96,7 @@ def new():
             "users":[data["session"]]
         }
 
-        pprint(database[str(event_id)]["timeslots"])
+        #pprint(database[str(event_id)]["timeslots"])
 
         return str(event_id)
         
@@ -122,7 +130,7 @@ def event(event_id):
             for time in data["availability"]:
                 timeList = time.split(",")
                 timeList = [int(timeList[0]), int(timeList[1])]
-                print(timeList)
+                debugOut(timeList)
                 if database[event_id]["timeslots"][timeList[0]][timeList[1]] == 1:
                     database[event_id]["timeslots"][timeList[0]][timeList[1]] = 0
         else:
@@ -135,14 +143,14 @@ def event(event_id):
         #add users session id to the list of users who've signed up
         database[event_id]["users"].append(data["session"])
 
-        pprint(database[event_id]["timeslots"])
+        #pprint(database[event_id]["timeslots"])
 
         return "success"
         
     else:
         #check if there is already a persistent cookie and if not, add one
         eventDetails = {"name":database[event_id]["name"], "description":database[event_id]["description"]}
-        print(request.cookies.get("session"))
+        debugOut(request.cookies.get("session"))
         join = make_response(render_template("eventJoin.html", **eventDetails))
         if not request.cookies.get("session"):
             #request.cookies.get("session") = binascii.b2a_hex(urandom(15)).decode("utf-8")
