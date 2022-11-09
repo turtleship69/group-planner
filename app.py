@@ -42,7 +42,7 @@ def index():
         resp.headers['Content-Type'] = 'application/json'
         pprint(TIMESLOTS)
         return resp
-    return render_template("index.html")
+    return render_template("new.html")
 
 """create a new event
 ask user for name, and brief description
