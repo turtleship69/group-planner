@@ -4,8 +4,9 @@ Select dates when you're free, or when you're busy, and see what dates work for 
 
 ## Usage
 
-Hopefully one day it'll actually be finished and you can use it. Not yet tho. 
-
+Go to /new to create a new event.
+Copy the link and send it to your friends.
+✨magic✨
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 

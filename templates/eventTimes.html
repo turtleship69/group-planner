@@ -10,18 +10,17 @@ should have a form with
 <html>
 
 <head>
-    <title>New Event</title>
+    <title>{{ name }}</title>
     <!-- Bootstrap core CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
-    <h1>New Event</h1>
+    <h1>These are the times that work for everyone (so far)</h1>
     <form method="post" onsubmit="return submitForm();">
-        <label for="name">Event Name</label>
-        <input type="text" name="name" id="name" required/>
-        <label for="description">Event Description</label>
-        <input type="text" name="description" id="description"/>
+        <label for="name">{{ name }}</label>
+        <br>
+        <label for="description">{{ description }}</label>
         <br>
         <!--check box to ask if user wants a blacklist or whitelist, with a tooltip in a questionmark logo next to it explaining the difference-->
         <label for="blacklist" data-toggle="tooltip" data-placement="right" title="Blacklist: Mark the days you are busy&#013;Whitelist: Mark the days you are free">Blacklist? (Hover for info)</label>
@@ -289,119 +288,18 @@ should have a form with
 
 
     <script>
-        function submitForm() {
-            //get session id from cookie
-            var session = getCookie("session");
-            //make a post request to the server with the values, event name and event description and navigate to the returned page
-            //if description is empty, set it to event name
-            var name = document.getElementById("name").value;
-            var description = document.getElementById("description").value;
-            if (description == "") {
-                description = name;
-            }
-            var checkboxes = document.getElementsByName('availability');
-            var values = [];
-            for (var i = 0; i < checkboxes.length; i++) {
-                if (checkboxes[i].checked) {
-                    values.push(checkboxes[i].value);
-                }
-            }
-            //for every element in values, swap the first and second element
-            for (var i = 0; i < values.length; i++) {
-                var temp = values[i].split(",");
-                values[i] = temp[1] + "," + temp[0];
-            }
-            console.log(values);
-            var data = {
-                name: name,
-                description: description,
-                session: session,
-                //if blacklist is checked, set it to true, otherwise false
-                blacklist: document.getElementById("blacklist").checked,
-                availability: values
-            };
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/new", true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.send(JSON.stringify(data));
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    window.location.href = window.location.origin+"/event/"+xhr.responseText;
-                }
-            }
-            return false;
-        }
-
-        function getCookie(cname) {
-            var name = cname + "=";
-            var decodedCookie = decodeURIComponent(document.cookie);
-            var ca = decodedCookie.split(';');
-            for (var i = 0; i < ca.length; i++) {
-                var c = ca[i];
-                while (c.charAt(0) == ' ') {
-                    c = c.substring(1);
-                }
-                if (c.indexOf(name) == 0) {
-                    return c.substring(name.length, c.length);
-                }
-            }
-            return "";
-        }
-        
-        
-        /* {
-            //make a post request to the server with the values, event name and event description
-            //if description is empty, set it to event name
-            var checkboxes = document.getElementsByName('availability');
-            var values = [];
-            for (var i = 0; i < checkboxes.length; i++) {
-                if (checkboxes[i].checked) {
-                    values.push(checkboxes[i].value);
-                }
-            }
-            console.log(values);
-            var eventName = document.getElementById('name').value;
-            var eventDescription = document.getElementById('description').value;
-            if (eventDescription == "") {
-                eventDescription = eventName;
-            }
-            var data = {
-                name: eventName,
-                description: eventDescription,
-                availability: values
-            };
-            console.log(data);
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/createEvent", true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.send(JSON.stringify(data));
-            return false;
-        } */
-        //if the user clicks and holds on a checkbox that is not selected and drags, it should select all the checkboxes in between
-        //if the user clicks and holds on a checkbox that is selected and drags, it should deselect all the checkboxes in between
-        /* onmousedown = function(e) {
-            var checkboxes = document.getElementsByName('availability');
-            var start = -1;
-            var end = -1;
-            var selected = false;
-            for (var i = 0; i < checkboxes.length; i++) {
-                if (checkboxes[i] == e.target) {
-                    start = i;
-                    if (checkboxes[i].checked) {
-                        selected = true;
-                    }
-                }
-                if (start != -1 && checkboxes[i].checked) {
-                    end = i;
-                }
-            }
-            if (start != -1 && end != -1) {
-                for (var i = start; i <= end; i++) {
-                    checkboxes[i].checked = !selected;
-                }
-            }
-        } */
-        
+cells = {{ availability }}; //will be replaced with the availability array in the form [[0,0],[0,1],[0,2]]
+// for each item in the array, find the corresponding checkbox and check it
+// the value of the checkbox is the day and hour of the week
+// disable editing all the checkboxes
+for (var i = 0; i < cells.length; i++) {
+    var day = cells[i][1];
+    var hour = cells[i][0];
+    var value = day + "," + hour;
+    var checkbox = document.querySelector('input[value="' + value + '"]');
+    checkbox.checked = true;
+    checkbox.disabled = true;
+}
     </script>
     <style>
         table {

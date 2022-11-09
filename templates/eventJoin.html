@@ -10,18 +10,15 @@ should have a form with
 <html>
 
 <head>
-    <title>New Event</title>
+    <title>{{ name }}</title>
     <!-- Bootstrap core CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
-    <h1>New Event</h1>
+    <h1>When are you free to join {{ name }}?</h1>
     <form method="post" onsubmit="return submitForm();">
-        <label for="name">Event Name</label>
-        <input type="text" name="name" id="name" required/>
-        <label for="description">Event Description</label>
-        <input type="text" name="description" id="description"/>
+        <label for="description">{{ description }}</label>
         <br>
         <!--check box to ask if user wants a blacklist or whitelist, with a tooltip in a questionmark logo next to it explaining the difference-->
         <label for="blacklist" data-toggle="tooltip" data-placement="right" title="Blacklist: Mark the days you are busy&#013;Whitelist: Mark the days you are free">Blacklist? (Hover for info)</label>
@@ -290,15 +287,11 @@ should have a form with
 
     <script>
         function submitForm() {
-            //get session id from cookie
-            var session = getCookie("session");
             //make a post request to the server with the values, event name and event description and navigate to the returned page
             //if description is empty, set it to event name
-            var name = document.getElementById("name").value;
-            var description = document.getElementById("description").value;
-            if (description == "") {
-                description = name;
-            }
+
+            //get session id from cookie
+            var sessionId = getCookie("session");
             var checkboxes = document.getElementsByName('availability');
             var values = [];
             for (var i = 0; i < checkboxes.length; i++) {
@@ -313,24 +306,24 @@ should have a form with
             }
             console.log(values);
             var data = {
-                name: name,
-                description: description,
-                session: session,
                 //if blacklist is checked, set it to true, otherwise false
                 blacklist: document.getElementById("blacklist").checked,
+                session: sessionId,
                 availability: values
             };
             var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/new", true);
+            xhr.open("POST", window.location.pathname, true);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.send(JSON.stringify(data));
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == 4 && xhr.status == 200) {
-                    window.location.href = window.location.origin+"/event/"+xhr.responseText;
+                    //reload the page
+                    location.reload();
                 }
             }
             return false;
         }
+
 
         function getCookie(cname) {
             var name = cname + "=";
@@ -347,36 +340,6 @@ should have a form with
             }
             return "";
         }
-        
-        
-        /* {
-            //make a post request to the server with the values, event name and event description
-            //if description is empty, set it to event name
-            var checkboxes = document.getElementsByName('availability');
-            var values = [];
-            for (var i = 0; i < checkboxes.length; i++) {
-                if (checkboxes[i].checked) {
-                    values.push(checkboxes[i].value);
-                }
-            }
-            console.log(values);
-            var eventName = document.getElementById('name').value;
-            var eventDescription = document.getElementById('description').value;
-            if (eventDescription == "") {
-                eventDescription = eventName;
-            }
-            var data = {
-                name: eventName,
-                description: eventDescription,
-                availability: values
-            };
-            console.log(data);
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/createEvent", true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.send(JSON.stringify(data));
-            return false;
-        } */
         //if the user clicks and holds on a checkbox that is not selected and drags, it should select all the checkboxes in between
         //if the user clicks and holds on a checkbox that is selected and drags, it should deselect all the checkboxes in between
         /* onmousedown = function(e) {
