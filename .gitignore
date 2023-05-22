@@ -1,3 +1,9 @@
 /.vscode
 /flask_session
 /__pycache__
+
+.replit
+poetry.lock
+pyproject.toml
+replit.nix
+/venv
